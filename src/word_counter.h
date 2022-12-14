@@ -8,61 +8,52 @@
 namespace wf
 {
 
+using CounterType = uint32_t;
+using CounterComparatorType = std::greater<CounterType>;
+
+using GroupByFreqView = std::map<CounterType, std::set<std::string_view>, CounterComparatorType>;
+
 class WordCounter
 {
 public:
-    using Container = std::unordered_map<std::string, uint32_t>;
-    using GroupByFreq = std::map<uint32_t, std::set<std::string_view>, std::greater<uint32_t>>;
+    using Container = std::unordered_map<std::string, CounterType>;
+
+private:
+    Container m_counter;
+    static const size_t APPROXIMATE_NUM_OF_WORDS = 10500000;
 
 public:
-    WordCounter()
+    WordCounter(size_t approximate_num_of_words = APPROXIMATE_NUM_OF_WORDS)
     {
-        m_counter.rehash(1500000);
+        m_counter.rehash(approximate_num_of_words);
     }
 
-    template<typename T>
-    void push(T&& word)
+    void push(std::string&& word)
     {
-        if (auto [it, inserted] = m_counter.try_emplace(std::forward<T>(word), 1); !inserted) {
+        if (auto [it, inserted] = m_counter.try_emplace(std::move(word), 1); !inserted) {
             ++it->second;
-            std::string().swap(word);
         }
     }
 
     auto group_by_freq() const
     {
-        auto word_freq = GroupByFreq();
+        auto word_freq = GroupByFreqView();
         for (const auto& [word, count] : m_counter) {
             auto it = word_freq.try_emplace(count).first;
-            it->second.emplace(static_cast<std::string_view>(word));
+            it->second.emplace(word);
         }
         return word_freq;
     }
 
-    const Container& words() const
+    size_t size() const 
     {
-        return m_counter;
+        return m_counter.size();
     }
 
-private:
-    Container m_counter;
+    size_t empty() const 
+    {
+        return m_counter.empty();
+    }
 };
-
-WordCounter count_words(std::wistream& in)
-{
-    WordCounter word_counter;
-    std::string word;
-    for (auto c = wchar_t(); in >> c; ) {
-        if (c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z') {
-            word.push_back(std::tolower(c));
-        } else if (!word.empty()) {
-            word_counter.push(std::move(word));
-        }
-    }
-    if (!word.empty()) {
-        word_counter.push(std::move(word));
-    }
-    return word_counter;
-}
 
 }

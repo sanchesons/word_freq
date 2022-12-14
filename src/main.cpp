@@ -1,18 +1,5 @@
-#include "word_counter.h"
+#include "helper.h"
 #include <iostream>
-
-void print_word_freq(const wf::WordCounter::GroupByFreq& word_freq)
-{
-    if(word_freq.empty()) {
-        return;
-    }
-    const auto number_width = std::to_string(word_freq.begin()->first).size();
-    for (const auto& [freq, words] : word_freq) {
-        for (const auto& word : words) {
-            std::cout << std::setw(number_width) << freq << " " << word << std::endl;
-        }
-    }
-}
 
 int main(int argc, const char* args[])
 {
@@ -30,7 +17,8 @@ int main(int argc, const char* args[])
     auto fin = std::wifstream(args[1]);
     fin >> std::noskipws;
 
-    print_word_freq(wf::count_words(fin).group_by_freq());
+    auto group = wf::count_words(fin).group_by_freq();
+    wf::print(group);
 
     return 0;
 }
