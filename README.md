@@ -13,5 +13,5 @@ cmake --build ..
 ## Run
 
 ```shell
-build/wf examples/text.txt
+build/wf --file examples/text.txt
 ```
