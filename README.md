@@ -1,5 +1,5 @@
 # Word freq
-This software developed to help with basic text analitics.
+This software developed to help with basic text analytics.
 
 ## Build
 
