@@ -17,7 +17,6 @@ int main(int argc, const char* argv[])
       std::cout << options.help() << std::endl;
       return 0;
     }
-
     auto file_path = args["file"].as<std::string>();
 
     try {

@@ -7,7 +7,7 @@ This software developed to help with basic text analytics.
 mkdir build 
 cd build
 cmake -DCMAKE_BUILD_TYPE=Release ..
-cmake --build ..
+cmake --build .
 ```
 
 ## Run
