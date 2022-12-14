@@ -7,11 +7,12 @@ include_directories(
     src/
 )
 
-add_executable(${PROJECT_NAME}
+add_executable(wf
     src/main.cpp
 )
 
-set_target_properties(${PROJECT_NAME} PROPERTIES
+set_target_properties(wf 
+PROPERTIES
     CXX_STANDARD 17
     CXX_STANDARD_REQUIRED ON
 )
