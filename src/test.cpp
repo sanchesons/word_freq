@@ -8,7 +8,7 @@ void test_empty_words()
     auto texts = std::array<std::wstring,3>{{
         L"",
         L"\n\n\0\n\n",
-        L"網站 !;%:;%:;%:\"привет мир!@#!網"
+        L" !;%:;%:;%:\"( ) !@#!"
     }};
 
     for (const auto& text : texts) {
@@ -19,6 +19,7 @@ void test_empty_words()
             throw std::logic_error("test_empty_words: not empty result");
         }
     }
+    std::cout << "PASSED" << std::endl;
 }
 
 void test_one_word()
@@ -31,7 +32,7 @@ void test_one_word()
 
     auto texts = std::array<Sample,2>{{
         {L"word", "word"},
-        {L"網站word\nпривет мир", "word"}
+        {L"網站\n", "網站"}
     }};
 
     for (const auto& [text, expexted_word] : texts) {
@@ -42,6 +43,7 @@ void test_one_word()
             throw std::logic_error("test_one_word: empty result");
         }
     }
+    std::cout << "PASSED" << std::endl;
 }
 
 void test_multi_words()
@@ -56,7 +58,7 @@ void test_multi_words()
 
     auto texts = std::array<Sample,2>{{
         {L"Why not start with.", {{1,"not"}, {1,"start"}, {1,"why"}, {1,"with"}}},
-        {L"網站word\nприветwordмир word網sentence.", {{3,"word"}, {1,"sentence"}}}
+        {L"網站 word\nпривет word word sentence.", {{3,"word"}, {1,"sentence"}, {1, "привет"}, {1, "網站"} }}
     }};
 
     for (const auto& [text, expexted] : texts) {
@@ -75,6 +77,7 @@ void test_multi_words()
             }
         }
     }
+    std::cout << "PASSED" << std::endl;
 }
 
 int main(int argc, const char* args[])
@@ -87,8 +90,6 @@ int main(int argc, const char* args[])
         std::cout << "FILED: " << e.what() << std::endl;
         return 1;
     }
-
-    std::cout << "PASSED" << std::endl;
 
     return 0;
 }

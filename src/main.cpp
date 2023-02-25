@@ -1,6 +1,10 @@
 #include "helper.h"
 #include "cxxopts.hpp"
+
 #include <iostream>
+#include <filesystem>
+
+namespace fs = std::filesystem;
 
 int main(int argc, const char* argv[])
 {
@@ -17,19 +21,11 @@ int main(int argc, const char* argv[])
       std::cout << options.help() << std::endl;
       return 0;
     }
-    auto file_path = args["file"].as<std::string>();
+    auto file_path = fs::path(args["file"].as<std::string>());
 
-    try {
-        std::locale::global(std::locale(""));
-    } catch(const std::exception& e) {
-        std::cout << "Couldn't set locale: " << e.what() << std::endl;
-    }
-
-    auto fin = std::wifstream(file_path);
-    fin >> std::noskipws;
-
-    auto group = wf::count_words(fin).group_by_freq();
-    wf::print(group);
+    auto word_counter = wf::count_words(file_path);
+    auto grouped = word_counter.group_by_freq();
+    wf::print(grouped);
 
     return 0;
 }

@@ -11,6 +11,9 @@ add_executable(wf
     src/main.cpp
 )
 
+target_link_libraries(wf
+    icuuc
+)
 set_target_properties(wf 
 PROPERTIES
     CXX_STANDARD 17
@@ -19,6 +22,10 @@ PROPERTIES
 
 add_executable(test
     src/test.cpp
+)
+
+target_link_libraries(test
+    icuuc
 )
 
 set_target_properties(test PROPERTIES

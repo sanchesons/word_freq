@@ -32,9 +32,7 @@ public:
 
     void push(std::string&& word)
     {
-        if (auto [it, inserted] = m_counter.try_emplace(std::move(word), 1); !inserted) {
-            ++it->second;
-        }
+        ++m_counter[std::move(word)];
     }
 
     auto group_by_freq() const
