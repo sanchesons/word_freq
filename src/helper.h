@@ -22,7 +22,7 @@ WordCounter count_words(std::wistream& in)
             char buffer[MB_CUR_MAX];
             auto pos = 0;
             U8_APPEND_UNSAFE(buffer, pos, lower_ch);
-            word.append(std::string(buffer, pos));
+            word.append(buffer, pos);
         }
         if (!word.empty()) {
             word_counter.push(std::move(word));
