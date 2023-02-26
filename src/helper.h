@@ -17,7 +17,7 @@ WordCounter count_words(std::wistream& in)
     WordCounter word_counter;
     for (auto ch = wchar_t(); !in.eof();) {
         std::string word;
-        for (in >> ch; !in.eof() && u_isUAlphabetic(ch); in >> ch) {
+        while (in >> ch && u_isUAlphabetic(ch)) {
             auto lower_ch = u_tolower(ch);
             char buffer[MB_CUR_MAX];
             auto pos = 0;
@@ -29,6 +29,18 @@ WordCounter count_words(std::wistream& in)
         }
     }
     return word_counter;
+}
+
+WordCounter count_words()
+{
+    const auto converter = new std::codecvt_utf8<wchar_t>();
+    const std::locale utf8_locale = std::locale(std::locale(), converter);
+    std::locale::global(utf8_locale);
+
+    std::ios_base::sync_with_stdio(false);
+    std::wcin.imbue(utf8_locale);
+    std::wcin.unsetf(std::ios_base::skipws);
+    return count_words(std::wcin);
 }
 
 WordCounter count_words(const fs::path& filepath)
