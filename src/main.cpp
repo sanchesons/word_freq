@@ -9,9 +9,9 @@ namespace fs = std::filesystem;
 wf::WordCounter build_word_counter(const cxxopts::ParseResult& args)
 {
     if (args.count("file") != 0) {
-        auto file_path = fs::path(args["file"].as<std::string>());
-
-        return wf::count_words(file_path);
+        // auto file_path = fs::path(args["file"].as<std::string>());
+        // return wf::count_words(file_path);
+        return wf::count_words(args["file"].as<std::string>());
     }
     return wf::count_words();
 }

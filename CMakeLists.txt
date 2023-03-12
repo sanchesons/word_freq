@@ -10,7 +10,6 @@ include_directories(
 add_executable(wf
     src/main.cpp
 )
-
 target_link_libraries(wf
     icuuc
 )
@@ -23,12 +22,24 @@ PROPERTIES
 add_executable(test
     src/test.cpp
 )
-
 target_link_libraries(test
     icuuc
 )
-
 set_target_properties(test PROPERTIES
+    CXX_STANDARD 17
+    CXX_STANDARD_REQUIRED ON
+)
+
+add_executable(banchmark
+    src/banchmark.cpp
+)
+target_link_libraries(banchmark
+    icuuc
+)
+target_compile_options(banchmark PRIVATE
+    -fconcepts
+)
+set_target_properties(banchmark PROPERTIES
     CXX_STANDARD 17
     CXX_STANDARD_REQUIRED ON
 )

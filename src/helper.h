@@ -1,4 +1,5 @@
 #include "word_counter.h"
+#include "stream/utf8_input_stream.h"
 
 #include <unicode/unistr.h>
 #include <unicode/uchar.h>
@@ -12,6 +13,44 @@ namespace fs = std::filesystem;
 
 namespace wf
 {
+
+void test(const std::string& filepath)
+{
+    auto in = Utf8InputStream(filepath);
+    while (!in.eof()) {
+        auto ch = in.get();
+    }
+}
+
+void test(std::wistream& in)
+{
+    for (auto ch = wchar_t(); !in.eof();) {
+        in >> ch;
+    }
+}
+
+WordCounter count_words(const std::string& filepath)
+{
+    // TODO limit word size
+    WordCounter word_counter;
+    auto in = Utf8InputStream(filepath);
+    std::string word;
+    while (!in.eof()) {
+        auto ch = in.get();
+        if (u_isUAlphabetic(ch)) {
+            auto lower_ch = u_tolower(ch);
+            char buffer[MB_CUR_MAX];
+            auto pos = 0;
+            U8_APPEND_UNSAFE(buffer, pos, lower_ch);
+            word.append(buffer, pos);
+        } else if (!word.empty()) {
+            word_counter.push(word);
+            word.clear();
+        }
+    }
+    return word_counter;
+}
+
 WordCounter count_words(std::wistream& in)
 {
     WordCounter word_counter;

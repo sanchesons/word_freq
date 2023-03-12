@@ -30,6 +30,11 @@ public:
         m_counter.rehash(approximate_num_of_words);
     }
 
+    void push(const std::string& word)
+    {
+        ++m_counter[word];
+    }
+
     void push(std::string&& word)
     {
         ++m_counter[std::move(word)];
