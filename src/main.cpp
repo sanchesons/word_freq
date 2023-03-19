@@ -24,8 +24,7 @@ int main(int argc, const char* argv[])
         ("h,help", "print usage");
 
     auto args = options.parse(argc, argv);
-    if (args.count("help"))
-    {
+    if (args.count("help")) {
       std::cout << options.help() << std::endl;
       return 0;
     }

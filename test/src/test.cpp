@@ -1,5 +1,7 @@
 #include "helper.h"
 
+#include "cxxopts.hpp"
+
 #include <exception>
 #include <iostream>
 #include <vector>
@@ -7,11 +9,11 @@
 
 namespace fs = std::filesystem;
 
-void test_empty_words()
+void test_empty_words(const fs::path& base_dir)
 {
     auto files = std::array<fs::path,2>{{
-        fs::path("data/no-words/empty-file.txt"),
-        fs::path("data/no-words/non-alphabetic.txt")
+        base_dir / fs::path("no-words/empty-file.txt"),
+        base_dir / fs::path("no-words/non-alphabetic.txt")
     }};
 
     for (const auto& file : files) {
@@ -23,7 +25,7 @@ void test_empty_words()
     std::cout << "PASSED" << std::endl;
 }
 
-void test_one_word()
+void test_one_word(const fs::path& base_dir)
 {
     struct Sample
     {
@@ -32,8 +34,8 @@ void test_one_word()
     };
 
     auto test_cases = std::array<Sample,2>{{
-        {fs::path("data/one-word/en-word.txt"), "word"},
-        {fs::path("data/one-word/china-word.txt"), "網站"}
+        {base_dir / fs::path("one-word/en-word.txt"), "word"},
+        {base_dir / fs::path("one-word/china-word.txt"), "網站"}
     }};
 
     for (const auto& [filepath, expexted_word] : test_cases) {
@@ -45,7 +47,7 @@ void test_one_word()
     std::cout << "PASSED" << std::endl;
 }
 
-void test_multi_words()
+void test_multi_words(const fs::path& base_dir)
 {
     struct Sample
     {
@@ -56,8 +58,8 @@ void test_multi_words()
     };
 
     auto test_cases = std::array<Sample,2>{{
-        {fs::path("data/multi-words/only-ascii.txt"), {{1,"not"}, {1,"start"}, {1,"why"}, {1,"with"}}},
-        {fs::path("data/multi-words/china-ru-en.txt"), {{3,"word"}, {1,"sentence"}, {1, "привет"}, {1, "網站"} }}
+        { base_dir / fs::path("multi-words/only-ascii.txt"), {{1,"not"}, {1,"start"}, {1,"why"}, {1,"with"}}},
+        { base_dir / fs::path("multi-words/china-ru-en.txt"), {{3,"word"}, {1,"sentence"}, {1, "привет"}, {1, "網站"} }}
     }};
 
     for (const auto& [filepath, expexted] : test_cases) {
@@ -78,12 +80,26 @@ void test_multi_words()
 }
 
 
-int main(int argc, const char* args[])
+int main(int argc, const char* argv[])
 {
+    cxxopts::Options options("test", "unit tests for wf application");
+
+    options.add_options()
+        ("d,dir", "base dir of test's resources", cxxopts::value<std::string>())
+        ("h,help", "print usage");
+
+    auto args = options.parse(argc, argv);
+    if (args.count("help")) {
+      std::cout << options.help() << std::endl;
+      return 0;
+    }
+
+    auto base_dir = fs::path(args["dir"].as<std::string>());
+
     try {
-        test_empty_words();
-        test_one_word();
-        test_multi_words();
+        test_empty_words(base_dir);
+        test_one_word(base_dir);
+        test_multi_words(base_dir);
     } catch (const std::logic_error& e) {
         std::cout << "FILED: " << e.what() << std::endl;
         return 1;

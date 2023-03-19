@@ -12,5 +12,7 @@ set_target_properties(test PROPERTIES
     CXX_STANDARD 17
     CXX_STANDARD_REQUIRED ON
 )
-
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+
+enable_testing()
+add_test(NAME Test1 COMMAND test -d ${CMAKE_CURRENT_BINARY_DIR}/data)

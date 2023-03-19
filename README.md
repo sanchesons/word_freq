@@ -15,3 +15,9 @@ cmake --build .
 ```shell
 build/wf --file examples/text.txt
 ```
+
+## Test
+
+```shell
+ctest --test-dir build/test
+```
