@@ -1,20 +1,21 @@
 #include "helper.h"
+
 #include <exception>
 #include <iostream>
 #include <vector>
+#include <filesystem>
+
+namespace fs = std::filesystem;
 
 void test_empty_words()
 {
-    auto texts = std::array<std::wstring,3>{{
-        L"",
-        L"\n\n\0\n\n",
-        L" !;%:;%:;%:\"( ) !@#!"
+    auto files = std::array<fs::path,2>{{
+        fs::path("data/no-words/empty-file.txt"),
+        fs::path("data/no-words/non-alphabetic.txt")
     }};
 
-    for (const auto& text : texts) {
-        auto stream = std::wistringstream(text);
-        stream >> std::noskipws;
-        const auto wc = wf::count_words(stream);
+    for (const auto& file : files) {
+        const auto wc = wf::count_words(file);
         if (!wc.empty()) {
             throw std::logic_error("test_empty_words: not empty result");
         }
@@ -26,19 +27,17 @@ void test_one_word()
 {
     struct Sample
     {
-        std::wstring in_text;
+        fs::path filepath;
         std::string out_word;
     };
 
-    auto texts = std::array<Sample,2>{{
-        {L"word", "word"},
-        {L"網站\n", "網站"}
+    auto test_cases = std::array<Sample,2>{{
+        {fs::path("data/one-word/en-word.txt"), "word"},
+        {fs::path("data/one-word/china-word.txt"), "網站"}
     }};
 
-    for (const auto& [text, expexted_word] : texts) {
-        auto stream = std::wistringstream(text);
-        stream >> std::noskipws;
-        const auto wc = wf::count_words(stream);
+    for (const auto& [filepath, expexted_word] : test_cases) {
+        const auto wc = wf::count_words(filepath);
         if (wc.size() != 1) {
             throw std::logic_error("test_one_word: empty result");
         }
@@ -52,19 +51,17 @@ void test_multi_words()
     {
         using Out = std::vector<std::pair<uint32_t,std::string>>;
 
-        std::wstring in;
+        fs::path filepath;
         Out out;
     };
 
-    auto texts = std::array<Sample,2>{{
-        {L"Why not start with.", {{1,"not"}, {1,"start"}, {1,"why"}, {1,"with"}}},
-        {L"網站 word\nпривет word word sentence.", {{3,"word"}, {1,"sentence"}, {1, "привет"}, {1, "網站"} }}
+    auto test_cases = std::array<Sample,2>{{
+        {fs::path("data/multi-words/only-ascii.txt"), {{1,"not"}, {1,"start"}, {1,"why"}, {1,"with"}}},
+        {fs::path("data/multi-words/china-ru-en.txt"), {{3,"word"}, {1,"sentence"}, {1, "привет"}, {1, "網站"} }}
     }};
 
-    for (const auto& [text, expexted] : texts) {
-        auto stream = std::wistringstream(text);
-        stream >> std::noskipws;
-        const auto wc = wf::count_words(stream);
+    for (const auto& [filepath, expexted] : test_cases) {
+        const auto wc = wf::count_words(filepath);
         auto group = wc.group_by_freq();
 
         auto i = size_t(0);
@@ -79,6 +76,7 @@ void test_multi_words()
     }
     std::cout << "PASSED" << std::endl;
 }
+
 
 int main(int argc, const char* args[])
 {
