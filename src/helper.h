@@ -1,4 +1,5 @@
 #include "word_counter.h"
+#include "stream/utf_input_stream.h"
 
 #include <unicode/unistr.h>
 #include <unicode/uchar.h>
@@ -12,45 +13,38 @@ namespace fs = std::filesystem;
 
 namespace wf
 {
-WordCounter count_words(std::wistream& in)
+
+static const int MAX_WORD_SIZE = 1024;
+
+WordCounter count_words(UtfInputStream& in)
 {
     WordCounter word_counter;
-    for (auto ch = wchar_t(); !in.eof();) {
-        std::string word;
-        while (in >> ch && u_isUAlphabetic(ch)) {
+    std::string word;
+    while (!in.eof()) {
+        auto ch = in.get();
+        if (u_isUAlphabetic(ch) && word.size() < MAX_WORD_SIZE) {
             auto lower_ch = u_tolower(ch);
             char buffer[MB_CUR_MAX];
             auto pos = 0;
             U8_APPEND_UNSAFE(buffer, pos, lower_ch);
             word.append(buffer, pos);
-        }
-        if (!word.empty()) {
-            word_counter.push(std::move(word));
+        } else if (!word.empty()) {
+            word_counter.push(word);
+            word.clear();
         }
     }
     return word_counter;
 }
 
-WordCounter count_words()
-{
-    const auto converter = new std::codecvt_utf8<wchar_t>();
-    const std::locale utf8_locale = std::locale(std::locale(), converter);
-    std::locale::global(utf8_locale);
-
-    std::ios_base::sync_with_stdio(false);
-    std::wcin.imbue(utf8_locale);
-    std::wcin.unsetf(std::ios_base::skipws);
-    return count_words(std::wcin);
-}
-
 WordCounter count_words(const fs::path& filepath)
 {
-    const auto converter = new std::codecvt_utf8<wchar_t>();
-    const std::locale utf8_locale = std::locale(std::locale(), converter);
+    auto in = UtfInputStream(filepath.string());
+    return count_words(in);
+}
 
-    auto in = std::wifstream(filepath);
-    in.imbue(utf8_locale);
-    in.unsetf(std::ios_base::skipws);
+WordCounter count_words()
+{
+    auto in = UtfInputStream();
     return count_words(in);
 }
 
